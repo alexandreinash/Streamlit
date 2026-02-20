@@ -145,8 +145,9 @@ section[data-testid="stSidebar"] div {{
 }}
 .hero-desc {{
     font-size: 1.05rem;
-    /* hero container uses a dark, fixed gradient; text should always be light for contrast */
-    color: #f5f0eb !important;
+    /* ensure maximum contrast against dark background */
+    color: #ffffff !important;
+    text-shadow: 0 0 6px rgba(0,0,0,0.6);
     line-height: 1.7;
     max-width: 600px;
 }}
