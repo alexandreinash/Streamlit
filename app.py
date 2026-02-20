@@ -12,8 +12,9 @@ st.set_page_config(
 )
 
 # ── Session State ─────────────────────────────────────────────────────────────
+# always use dark mode; no light option available
 if "dark_mode" not in st.session_state:
-    st.session_state.dark_mode = False
+    st.session_state.dark_mode = True
 if "profile_photo_b64" not in st.session_state:
     st.session_state.profile_photo_b64 = None
 if "profile_photo_mime" not in st.session_state:
@@ -522,10 +523,8 @@ with st.sidebar:
 
     st.markdown("<hr style='border-color:rgba(201,168,76,0.3);margin:16px 0'>", unsafe_allow_html=True)
 
-    dm_label = "☀️  Light Mode" if st.session_state.dark_mode else "🌙  Dark Mode"
-    if st.button(dm_label, use_container_width=True):
-        st.session_state.dark_mode = not st.session_state.dark_mode
-        st.rerun()
+    # dark mode is permanent; toggle button removed
+    # (previously allowed switching modes)
 
     st.markdown(f"<div style='font-size:0.72rem;color:rgba(240,240,245,0.4);text-align:center;margin-top:10px;'>© 2025 Alexandrei Nash Dinapo</div>", unsafe_allow_html=True)
 
