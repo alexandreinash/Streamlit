@@ -1,5 +1,4 @@
-# CineMindAI — Streamlit Community Cloud
-# Use Chroma 1.x wheels on Python 3.14 (do not pin chromadb<0.6 — forces broken hnswlib build)
+# CineMindAI — Streamlit Community Cloud (no ChromaDB — avoids protobuf/otel crash)
 streamlit>=1.39
 python-dotenv>=1.0
 openai>=1.50
@@ -10,5 +9,4 @@ langchain-community>=0.3
 langchain-openai>=0.2
 langchain-text-splitters>=0.3
 
-chromadb>=0.5.5
 sentence-transformers>=2.7

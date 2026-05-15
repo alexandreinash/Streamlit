@@ -10,19 +10,15 @@ import sys
 from pathlib import Path
 from typing import List
 
-os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
-# ChromaDB / OpenTelemetry vs protobuf 4+ on Streamlit Cloud
-os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 
-import chromadb
 from langchain_classic.chains import RetrievalQA
-from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
 from langchain_core.prompts import PromptTemplate
+from langchain_core.vectorstores import InMemoryVectorStore
 from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -128,12 +124,7 @@ def build_rag_chain(api_key: str):
 
     with quiet_stdio():
         embeddings = HuggingFaceMiniLMEmbeddings()
-        client = chromadb.EphemeralClient()
-        vectorstore = Chroma(
-            client=client,
-            collection_name="cinemind_movies",
-            embedding_function=embeddings,
-        )
+        vectorstore = InMemoryVectorStore(embeddings)
         vectorstore.add_documents(chunks)
 
     n = max(len(chunks), 1)

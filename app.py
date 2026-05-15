@@ -3,10 +3,6 @@ CineMindAI — Streamlit UI (fast startup; RAG loads on demand).
 """
 
 import os
-
-os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
-os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
-
 import random
 import re
 from datetime import datetime
