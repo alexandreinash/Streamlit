@@ -1,18 +1,13 @@
-# CineMindAI — pinned for Streamlit Community Cloud
-streamlit==1.39.0
-python-dotenv==1.0.1
-openai==1.54.0
+# CineMindAI — Streamlit Community Cloud (no custom port; no invalid pins)
+streamlit>=1.39
+python-dotenv>=1.0
+openai>=1.50
 
-langchain==0.3.7
-langchain-core==0.3.15
-langchain-community==0.3.7
-langchain-openai==0.2.6
-langchain-text-splitters==0.3.2
-langchain-classic==0.3.7
+langchain>=1.0
+langchain-classic>=1.0.7
+langchain-community>=0.3
+langchain-openai>=0.2
+langchain-text-splitters>=0.3
 
-chromadb==0.5.5
-sentence-transformers==2.7.0
-
-# CPU-only PyTorch (smaller; required by sentence-transformers on Cloud)
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.2+cpu
+chromadb>=0.5
+sentence-transformers>=2.7
