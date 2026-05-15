@@ -1,0 +1,23 @@
+[theme]
+primaryColor = "#e50914"
+backgroundColor = "#0a0a0a"
+secondaryBackgroundColor = "#111111"
+textColor = "#eeeeee"
+font = "sans serif"
+
+[server]
+port = 8502
+headless = true
+fileWatcherType = "auto"
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+
+[client]
+toolbarMode = "minimal"
+showSidebarNavigation = false
+
+[runner]
+fastReruns = true
+magicEnabled = false
