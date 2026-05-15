@@ -1225,6 +1225,69 @@ def render_sidebar() -> None:
             st.rerun()
 
 
+def run_app() -> None:
+    inject_styles()
+    purge_legacy_session()
+    init_session_state()
+
+    if st.session_state.get("rag_ready") and not st.session_state.get("qa_chain"):
+        reset_rag_state()
+
+    render_sidebar()
+
+    api_key = get_openai_api_key()
+    if not api_key or api_key.strip() in ("", "your_api_key_here"):
+        st.error("⚠️ OpenAI API key required")
+        st.markdown(
+            """
+            **Local:** add `OPENAI_API_KEY` to your `.env` file.
+
+            **Streamlit Cloud:** open **Manage app → Settings → Secrets** and add:
+
+            ```toml
+            OPENAI_API_KEY = "sk-your-key-here"
+            ```
+            """
+        )
+        st.stop()
+
+    if not MOVIES_FILE.exists():
+        st.error("Missing `movies.txt` in the repository.")
+        st.stop()
+
+    movie_count = len(get_movie_titles())
+    online = ensure_rag_ready()
+    page = st.session_state.get("page", "dashboard")
+
+    if not online and page in POST_LAUNCH_PAGES:
+        st.session_state.page = "dashboard"
+        page = "dashboard"
+
+    if online and page == "launch":
+        st.session_state.page = "dashboard"
+        page = "dashboard"
+
+    if page == "dashboard":
+        render_dashboard(movie_count, online, api_key)
+    elif page == "launch":
+        render_launch_page(api_key, movie_count)
+    elif page == "pick":
+        if render_page_gate():
+            render_reel_studio(get_movie_titles())
+    elif page == "compare":
+        if render_page_gate():
+            render_compare_page(movie_count, get_movie_titles())
+    elif page == "library":
+        if render_page_gate():
+            render_library_page()
+    elif page == "watchlist":
+        if render_page_gate():
+            render_watchlist_page()
+    elif page == "chat":
+        if render_page_gate():
+            render_chat(st.session_state.qa_chain)
+
+
 # =============================================================================
 # Main app flow
 # =============================================================================
@@ -1235,52 +1298,12 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-inject_styles()
-purge_legacy_session()
-init_session_state()
-
-if st.session_state.get("rag_ready") and not st.session_state.get("qa_chain"):
-    reset_rag_state()
-
-render_sidebar()
-
-api_key = get_openai_api_key()
-if not api_key or api_key.strip() in ("", "your_api_key_here"):
-    st.error("⚠️ Add `OPENAI_API_KEY` to your `.env` file.")
-    st.stop()
-
-if not MOVIES_FILE.exists():
-    st.error(f"Missing `movies.txt`")
-    st.stop()
-
-movie_count = len(get_movie_titles())
-online = ensure_rag_ready()
-page = st.session_state.get("page", "dashboard")
-
-if not online and page in POST_LAUNCH_PAGES:
-    st.session_state.page = "dashboard"
-    page = "dashboard"
-
-if online and page == "launch":
-    st.session_state.page = "dashboard"
-    page = "dashboard"
-
-if page == "dashboard":
-    render_dashboard(movie_count, online, api_key)
-elif page == "launch":
-    render_launch_page(api_key, movie_count)
-elif page == "pick":
-    if render_page_gate():
-        render_reel_studio(get_movie_titles())
-elif page == "compare":
-    if render_page_gate():
-        render_compare_page(movie_count, get_movie_titles())
-elif page == "library":
-    if render_page_gate():
-        render_library_page()
-elif page == "watchlist":
-    if render_page_gate():
-        render_watchlist_page()
-elif page == "chat":
-    if render_page_gate():
-        render_chat(st.session_state.qa_chain)
+try:
+    run_app()
+except Exception as exc:
+    st.error("CineMindAI failed to start")
+    st.exception(exc)
+    st.info(
+        "If this is on Streamlit Cloud: check **Secrets** (`OPENAI_API_KEY`), "
+        "then **Manage app → Logs**. Redeploy after updating `requirements.txt`."
+    )

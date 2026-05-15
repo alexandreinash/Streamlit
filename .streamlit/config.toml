@@ -6,17 +6,10 @@ textColor = "#eeeeee"
 font = "sans serif"
 
 [server]
-port = 8502
 headless = true
-fileWatcherType = "auto"
 
 [browser]
 gatherUsageStats = false
-serverAddress = "localhost"
-
-[client]
-toolbarMode = "minimal"
-showSidebarNavigation = false
 
 [runner]
 fastReruns = true
