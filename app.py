@@ -12,6 +12,9 @@ from typing import Dict, List, Optional
 import streamlit as st
 from dotenv import load_dotenv
 
+from agent_tools import gather_tool_layer
+from prompt_defense import validate_chat_input
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -189,8 +192,22 @@ def enrich_question_for_retrieval(question: str) -> str:
     return f"{question}\n\nRelevant library films: {extra}"
 
 
-def ask_cinemind(qa_chain, question: str) -> tuple[str, list]:
-    query = enrich_question_for_retrieval(question)
+def ask_cinemind(
+    qa_chain, question: str, api_key: Optional[str] = None
+) -> tuple[str, list]:
+    safe, err = validate_chat_input(question)
+    if err:
+        return err, []
+
+    tool_layer = ""
+    if api_key:
+        tool_layer = gather_tool_layer(api_key, safe)
+    query = enrich_question_for_retrieval(safe)
+    if tool_layer:
+        query = (
+            f"{query}\n\n[Structured library facts from tools — use only if consistent "
+            f"with retrieved context:]\n{tool_layer}"
+        )
     result = qa_chain.invoke({"query": query})
     answer = result.get("result", "Sorry, I could not generate a response.").strip()
     return answer, result.get("source_documents", [])
@@ -1165,7 +1182,9 @@ def render_chat(qa_chain) -> None:
         st.session_state.messages.append({"role": "user", "content": user_text})
         with st.spinner("Finding movies for you…"):
             try:
-                answer, sources = ask_cinemind(qa_chain, user_text)
+                answer, sources = ask_cinemind(
+                    qa_chain, user_text, get_openai_api_key()
+                )
                 src_titles = []
                 for doc in sources:
                     t = doc.metadata.get("title")
